@@ -1,0 +1,992 @@
+"""
+Codecademy GraphQL Schema
+Conceptual schema based on the Codecademy online programming education platform
+and the partner API documented at https://partners.codecademy.com/api/documentation
+"""
+
+# ─────────────────────────────────────────────
+# Scalars
+# ─────────────────────────────────────────────
+
+scalar DateTime
+scalar URL
+scalar JSON
+
+# ─────────────────────────────────────────────
+# Enums
+# ─────────────────────────────────────────────
+
+enum UserRole {
+  LEARNER
+  INSTRUCTOR
+  ADMIN
+  TEAM_MANAGER
+  PARTNER
+}
+
+enum ContentStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+  DEPRECATED
+}
+
+enum DifficultyLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum ExerciseTypeEnum {
+  CODE
+  MULTIPLE_CHOICE
+  FILL_IN_THE_BLANK
+  DRAG_AND_DROP
+  SHORT_ANSWER
+  VIDEO
+  ARTICLE
+  PROJECT
+}
+
+enum ProgressStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+  PAUSED
+}
+
+enum SubscriptionPlan {
+  FREE
+  PLUS
+  PRO
+  BUSINESS
+  ENTERPRISE
+}
+
+enum WebhookEvent {
+  LEARNER_ENROLLED
+  LEARNER_COMPLETED_COURSE
+  LEARNER_COMPLETED_PATH
+  LEARNER_EARNED_CERTIFICATE
+  ASSIGNMENT_COMPLETED
+  TEAM_MEMBER_ADDED
+  TEAM_MEMBER_REMOVED
+}
+
+# ─────────────────────────────────────────────
+# User Domain
+# ─────────────────────────────────────────────
+
+"""A registered Codecademy user account."""
+type User {
+  id: ID!
+  username: String!
+  email: String!
+  role: UserRole!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  details: UserDetails
+  profile: UserProfile
+  skills: UserSkills
+  enrollments: [Enrollment!]
+  certificates: [Certificate!]
+  subscription: Subscription
+  teams: [Team!]
+  apiKeys: [APIKey!]
+}
+
+"""Extended details for a Codecademy user account."""
+type UserDetails {
+  id: ID!
+  userId: ID!
+  firstName: String
+  lastName: String
+  displayName: String
+  bio: String
+  avatarUrl: URL
+  location: String
+  website: URL
+  joinedAt: DateTime!
+  lastActiveAt: DateTime
+  timezone: String
+  language: String
+  emailVerified: Boolean!
+  marketingOptIn: Boolean!
+}
+
+"""Public-facing profile information for a Codecademy user."""
+type UserProfile {
+  id: ID!
+  userId: ID!
+  username: String!
+  displayName: String
+  bio: String
+  avatarUrl: URL
+  streakDays: Int!
+  totalXp: Int!
+  completedCourses: Int!
+  completedPaths: Int!
+  certificates: [Certificate!]
+  skills: [Skill!]
+  isPublic: Boolean!
+}
+
+"""Aggregated skill data for a user across all completed content."""
+type UserSkills {
+  userId: ID!
+  skills: [SkillDetails!]!
+  topSkills: [Skill!]!
+  totalSkillsEarned: Int!
+  lastUpdatedAt: DateTime!
+}
+
+# ─────────────────────────────────────────────
+# Learner Domain
+# ─────────────────────────────────────────────
+
+"""A learner record within a team or cohort context."""
+type Learner {
+  id: ID!
+  userId: ID!
+  teamId: ID
+  cohortId: ID
+  enrolledAt: DateTime!
+  status: ProgressStatus!
+  user: User!
+  details: LearnerDetails
+  progress: [Progress!]
+  assignments: [Assignment!]
+}
+
+"""Detailed learner data including activity metrics and completion stats."""
+type LearnerDetails {
+  id: ID!
+  learnerId: ID!
+  totalTimeSpentMinutes: Int!
+  lastActivityAt: DateTime
+  coursesCompleted: Int!
+  pathsCompleted: Int!
+  exercisesCompleted: Int!
+  quizzesCompleted: Int!
+  projectsCompleted: Int!
+  currentStreak: Int!
+  longestStreak: Int!
+  xpEarned: Int!
+  level: Int!
+}
+
+# ─────────────────────────────────────────────
+# Course Domain
+# ─────────────────────────────────────────────
+
+"""A Codecademy course covering a topic or skill area."""
+type Course {
+  id: ID!
+  slug: String!
+  title: String!
+  description: String!
+  shortDescription: String
+  difficulty: DifficultyLevel!
+  status: ContentStatus!
+  durationMinutes: Int!
+  language: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  publishedAt: DateTime
+  details: CourseDetails
+  content: CourseContent
+  skills: [Skill!]
+  tracks: [Track!]
+  paths: [Path!]
+  enrollmentCount: Int
+}
+
+"""Detailed metadata for a Codecademy course."""
+type CourseDetails {
+  courseId: ID!
+  prerequisites: [Course!]
+  instructors: [String!]
+  learningObjectives: [String!]!
+  syllabus: String
+  certificateAvailable: Boolean!
+  proOnly: Boolean!
+  mobileAvailable: Boolean!
+  offlineAvailable: Boolean!
+  tags: [String!]
+  rating: Float
+  reviewCount: Int
+  lastReviewedAt: DateTime
+}
+
+"""The full content structure of a course, including all lessons."""
+type CourseContent {
+  courseId: ID!
+  modules: [Module!]!
+  totalLessons: Int!
+  totalExercises: Int!
+  totalQuizzes: Int!
+  totalProjects: Int!
+}
+
+"""A module grouping lessons within a course."""
+type Module {
+  id: ID!
+  courseId: ID!
+  title: String!
+  description: String
+  orderIndex: Int!
+  lessons: [Lesson!]!
+}
+
+# ─────────────────────────────────────────────
+# Track Domain
+# ─────────────────────────────────────────────
+
+"""A Codecademy track grouping related courses around a subject."""
+type Track {
+  id: ID!
+  slug: String!
+  title: String!
+  description: String!
+  status: ContentStatus!
+  durationMinutes: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  details: TrackDetails
+  courses: [Course!]!
+  skills: [Skill!]
+  paths: [Path!]
+}
+
+"""Detailed metadata for a track."""
+type TrackDetails {
+  trackId: ID!
+  learningObjectives: [String!]!
+  prerequisites: [Track!]
+  proOnly: Boolean!
+  certificateAvailable: Boolean!
+  enrollmentCount: Int
+  rating: Float
+  tags: [String!]
+}
+
+"""Progress of a learner through a track."""
+type TrackProgress {
+  id: ID!
+  userId: ID!
+  trackId: ID!
+  track: Track!
+  status: ProgressStatus!
+  percentComplete: Float!
+  coursesCompleted: Int!
+  totalCourses: Int!
+  startedAt: DateTime
+  completedAt: DateTime
+  lastActivityAt: DateTime
+}
+
+# ─────────────────────────────────────────────
+# Path Domain
+# ─────────────────────────────────────────────
+
+"""A Codecademy career or skill path comprising multiple tracks and courses."""
+type Path {
+  id: ID!
+  slug: String!
+  title: String!
+  description: String!
+  pathType: String!
+  status: ContentStatus!
+  durationMinutes: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  details: PathDetails
+  tracks: [Track!]
+  courses: [Course!]
+  skills: [Skill!]
+  certificate: Certificate
+}
+
+"""Detailed metadata for a career or skill path."""
+type PathDetails {
+  pathId: ID!
+  learningObjectives: [String!]!
+  prerequisites: [String!]
+  proOnly: Boolean!
+  jobRoles: [String!]
+  averageSalary: String
+  enrollmentCount: Int
+  rating: Float
+  tags: [String!]
+}
+
+"""Progress of a learner through a path."""
+type PathProgress {
+  id: ID!
+  userId: ID!
+  pathId: ID!
+  path: Path!
+  status: ProgressStatus!
+  percentComplete: Float!
+  tracksCompleted: Int!
+  totalTracks: Int!
+  coursesCompleted: Int!
+  totalCourses: Int!
+  startedAt: DateTime
+  completedAt: DateTime
+  lastActivityAt: DateTime
+}
+
+# ─────────────────────────────────────────────
+# Lesson Domain
+# ─────────────────────────────────────────────
+
+"""A lesson within a course module."""
+type Lesson {
+  id: ID!
+  courseId: ID!
+  moduleId: ID!
+  slug: String!
+  title: String!
+  description: String
+  orderIndex: Int!
+  durationMinutes: Int!
+  status: ContentStatus!
+  details: LessonDetails
+  exercises: [Exercise!]!
+}
+
+"""Detailed content and metadata for a lesson."""
+type LessonDetails {
+  lessonId: ID!
+  learningObjectives: [String!]!
+  prerequisites: [Lesson!]
+  exerciseCount: Int!
+  quizCount: Int!
+  projectCount: Int!
+  hasVideo: Boolean!
+  hasArticle: Boolean!
+  conceptsIntroduced: [String!]
+}
+
+# ─────────────────────────────────────────────
+# Exercise Domain
+# ─────────────────────────────────────────────
+
+"""An individual exercise within a lesson."""
+type Exercise {
+  id: ID!
+  lessonId: ID!
+  title: String!
+  instructions: String!
+  orderIndex: Int!
+  exerciseType: ExerciseTypeEnum!
+  durationMinutes: Int!
+  status: ContentStatus!
+  details: ExerciseDetails
+}
+
+"""Detailed content and configuration for an exercise."""
+type ExerciseDetails {
+  exerciseId: ID!
+  starterCode: String
+  solutionCode: String
+  checkpointTests: [String!]
+  hints: [String!]
+  language: String
+  conceptsCovered: [String!]
+  xpReward: Int!
+  maxAttempts: Int
+}
+
+"""The type classification of an exercise."""
+type ExerciseType {
+  id: ID!
+  name: ExerciseTypeEnum!
+  displayName: String!
+  description: String!
+  supportsCodeExecution: Boolean!
+  supportsHints: Boolean!
+}
+
+# ─────────────────────────────────────────────
+# Quiz Domain
+# ─────────────────────────────────────────────
+
+"""A quiz assessing learner comprehension at lesson or course level."""
+type Quiz {
+  id: ID!
+  title: String!
+  lessonId: ID
+  courseId: ID
+  questionCount: Int!
+  passingScore: Int!
+  timeLimitMinutes: Int
+  details: QuizDetails
+}
+
+"""Detailed configuration and questions for a quiz."""
+type QuizDetails {
+  quizId: ID!
+  questions: [QuizQuestion!]!
+  shuffleQuestions: Boolean!
+  shuffleAnswers: Boolean!
+  maxAttempts: Int
+  xpReward: Int!
+  showCorrectAnswers: Boolean!
+}
+
+"""An individual question within a quiz."""
+type QuizQuestion {
+  id: ID!
+  quizId: ID!
+  questionText: String!
+  questionType: ExerciseTypeEnum!
+  answers: [QuizAnswer!]!
+  orderIndex: Int!
+  points: Int!
+}
+
+"""An answer option for a quiz question."""
+type QuizAnswer {
+  id: ID!
+  questionId: ID!
+  answerText: String!
+  isCorrect: Boolean
+  explanation: String
+}
+
+# ─────────────────────────────────────────────
+# Project Domain
+# ─────────────────────────────────────────────
+
+"""A hands-on project in Codecademy's Workspaces or guided project environment."""
+type Project {
+  id: ID!
+  title: String!
+  description: String!
+  difficulty: DifficultyLevel!
+  durationMinutes: Int!
+  language: String!
+  status: ContentStatus!
+  courseId: ID
+  pathId: ID
+  details: ProjectDetails
+  skills: [Skill!]
+}
+
+"""Detailed configuration and resources for a project."""
+type ProjectDetails {
+  projectId: ID!
+  objectives: [String!]!
+  starterFiles: [String!]
+  solutionFiles: [String!]
+  requiredTechnologies: [String!]!
+  workspaceType: String
+  reviewable: Boolean!
+  xpReward: Int!
+  hints: [String!]
+}
+
+# ─────────────────────────────────────────────
+# Skill Domain
+# ─────────────────────────────────────────────
+
+"""A skill tag representing a technology, concept, or competency."""
+type Skill {
+  id: ID!
+  slug: String!
+  name: String!
+  category: String!
+  description: String
+  courses: [Course!]
+  paths: [Path!]
+  tracks: [Track!]
+  details: SkillDetails
+}
+
+"""Detailed information and proficiency data for a skill."""
+type SkillDetails {
+  skillId: ID!
+  proficiencyLevel: DifficultyLevel
+  relatedSkills: [Skill!]
+  industryRelevance: String
+  jobRoles: [String!]
+  learnersWithSkill: Int
+  averageTimeToLearnMinutes: Int
+}
+
+"""A named collection of skills forming a competency area."""
+type SkillSet {
+  id: ID!
+  name: String!
+  description: String!
+  skills: [Skill!]!
+  paths: [Path!]
+  teamId: ID
+  requiredProficiency: DifficultyLevel
+}
+
+# ─────────────────────────────────────────────
+# Progress Domain
+# ─────────────────────────────────────────────
+
+"""Overall progress record for a learner on a piece of content."""
+type Progress {
+  id: ID!
+  userId: ID!
+  contentId: ID!
+  contentType: String!
+  status: ProgressStatus!
+  percentComplete: Float!
+  startedAt: DateTime
+  completedAt: DateTime
+  lastActivityAt: DateTime
+  details: ProgressDetails
+}
+
+"""Granular progress data including time spent and checkpoint completions."""
+type ProgressDetails {
+  progressId: ID!
+  timeSpentMinutes: Int!
+  exercisesCompleted: Int!
+  totalExercises: Int!
+  checkpointsCompleted: Int!
+  totalCheckpoints: Int!
+  xpEarned: Int!
+  hintsUsed: Int!
+  attemptsCount: Int!
+  lastExerciseId: ID
+}
+
+"""A completion record when a learner finishes a course, path, or track."""
+type Completion {
+  id: ID!
+  userId: ID!
+  contentId: ID!
+  contentType: String!
+  completedAt: DateTime!
+  timeSpentMinutes: Int!
+  xpEarned: Int!
+  certificateIssued: Boolean!
+  certificate: Certificate
+}
+
+# ─────────────────────────────────────────────
+# Certificate Domain
+# ─────────────────────────────────────────────
+
+"""A certificate of completion issued to a learner."""
+type Certificate {
+  id: ID!
+  userId: ID!
+  pathId: ID
+  courseId: ID
+  title: String!
+  issuedAt: DateTime!
+  expiresAt: DateTime
+  verificationUrl: URL!
+  details: CertificateDetails
+  certificationPath: CertificationPath
+}
+
+"""Detailed data on an issued certificate including issuer and verification info."""
+type CertificateDetails {
+  certificateId: ID!
+  recipientName: String!
+  issuerName: String!
+  credentialId: String!
+  shareableUrl: URL!
+  linkedInShareUrl: URL
+  badgeImageUrl: URL
+  competenciesCovered: [String!]!
+  externalVerifier: String
+}
+
+"""A defined certification path that a learner can pursue to earn a credential."""
+type CertificationPath {
+  id: ID!
+  slug: String!
+  title: String!
+  description: String!
+  issuer: String!
+  requiredPaths: [Path!]
+  requiredCourses: [Course!]
+  durationMinutes: Int!
+  validityPeriodDays: Int
+  examRequired: Boolean!
+  details: PathDetails
+}
+
+# ─────────────────────────────────────────────
+# Team Domain
+# ─────────────────────────────────────────────
+
+"""A team or organization account on Codecademy for Business."""
+type Team {
+  id: ID!
+  name: String!
+  slug: String!
+  ownerId: ID!
+  planId: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  details: TeamDetails
+  members: [TeamMember!]!
+  cohorts: [Cohort!]
+  assignments: [Assignment!]
+  subscription: Subscription
+  skillSets: [SkillSet!]
+}
+
+"""Detailed configuration and usage data for a team account."""
+type TeamDetails {
+  teamId: ID!
+  companyName: String
+  industry: String
+  size: Int
+  seatCount: Int!
+  seatsUsed: Int!
+  adminEmails: [String!]!
+  ssoEnabled: Boolean!
+  customBrandingEnabled: Boolean!
+  reportingEnabled: Boolean!
+  apiEnabled: Boolean!
+  webhooksEnabled: Boolean!
+}
+
+"""A member of a Codecademy team."""
+type TeamMember {
+  id: ID!
+  teamId: ID!
+  userId: ID!
+  role: UserRole!
+  joinedAt: DateTime!
+  invitedBy: ID
+  isActive: Boolean!
+  user: User!
+  learner: Learner
+  assignmentsCompleted: Int!
+}
+
+# ─────────────────────────────────────────────
+# Plan Domain
+# ─────────────────────────────────────────────
+
+"""A Codecademy subscription plan."""
+type Plan {
+  id: ID!
+  name: String!
+  planType: SubscriptionPlan!
+  description: String!
+  details: PlanDetails
+  subscriptions: [Subscription!]
+}
+
+"""Detailed features and pricing for a plan."""
+type PlanDetails {
+  planId: ID!
+  monthlyPriceUsd: Float
+  annualPriceUsd: Float
+  seatBased: Boolean!
+  maxSeats: Int
+  features: [String!]!
+  contentAccess: String!
+  apiAccess: Boolean!
+  reportsAccess: Boolean!
+  ssoSupported: Boolean!
+  supportTier: String!
+  trialDays: Int
+}
+
+"""An active subscription of a user or team to a plan."""
+type Subscription {
+  id: ID!
+  userId: ID
+  teamId: ID
+  planId: ID!
+  plan: Plan!
+  status: String!
+  startedAt: DateTime!
+  renewsAt: DateTime
+  cancelledAt: DateTime
+  seatCount: Int
+  billingInterval: String
+}
+
+# ─────────────────────────────────────────────
+# Enrollment Domain
+# ─────────────────────────────────────────────
+
+"""An enrollment of a learner in a course or path."""
+type Enrollment {
+  id: ID!
+  userId: ID!
+  contentId: ID!
+  contentType: String!
+  enrolledAt: DateTime!
+  status: ProgressStatus!
+  details: EnrollmentDetails
+  progress: Progress
+}
+
+"""Detailed metadata for an enrollment record."""
+type EnrollmentDetails {
+  enrollmentId: ID!
+  source: String
+  assignmentId: ID
+  cohortId: ID
+  selfEnrolled: Boolean!
+  completedAt: DateTime
+  droppedAt: DateTime
+  lastActivityAt: DateTime
+  daysActive: Int!
+}
+
+"""An assignment of content to a learner or cohort by a team admin."""
+type Assignment {
+  id: ID!
+  teamId: ID!
+  contentId: ID!
+  contentType: String!
+  title: String!
+  dueDate: DateTime
+  createdAt: DateTime!
+  createdBy: ID!
+  status: String!
+  details: AssignmentDetails
+  cohort: Cohort
+  enrollments: [Enrollment!]
+}
+
+"""Detailed status and progress data for an assignment."""
+type AssignmentDetails {
+  assignmentId: ID!
+  description: String
+  requiredScore: Int
+  isRequired: Boolean!
+  learnersAssigned: Int!
+  learnersCompleted: Int!
+  completionRate: Float!
+  averageScore: Float
+  remindersEnabled: Boolean!
+  reminderFrequencyDays: Int
+}
+
+"""A cohort grouping learners together for a structured learning experience."""
+type Cohort {
+  id: ID!
+  teamId: ID!
+  name: String!
+  description: String
+  startDate: DateTime
+  endDate: DateTime
+  createdAt: DateTime!
+  details: CohortDetails
+  members: [Learner!]!
+  assignments: [Assignment!]
+}
+
+"""Detailed configuration and progress data for a cohort."""
+type CohortDetails {
+  cohortId: ID!
+  maxSize: Int
+  currentSize: Int!
+  managerId: ID
+  skillSets: [SkillSet!]
+  completionRate: Float!
+  averageProgressPercent: Float!
+  isActive: Boolean!
+}
+
+# ─────────────────────────────────────────────
+# Workspace Domain
+# ─────────────────────────────────────────────
+
+"""A Codecademy Workspace for running code in the browser."""
+type Workspace {
+  id: ID!
+  userId: ID!
+  title: String!
+  language: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  isPublic: Boolean!
+  details: WorkspaceDetails
+}
+
+"""Detailed configuration and file contents of a workspace."""
+type WorkspaceDetails {
+  workspaceId: ID!
+  description: String
+  files: [WorkspaceFile!]!
+  runtime: String!
+  containerImage: String
+  shareUrl: URL
+  forkCount: Int!
+  isTemplate: Boolean!
+  projectId: ID
+}
+
+"""A file within a Codecademy Workspace."""
+type WorkspaceFile {
+  id: ID!
+  workspaceId: ID!
+  filename: String!
+  content: String!
+  language: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+# ─────────────────────────────────────────────
+# API Access Domain
+# ─────────────────────────────────────────────
+
+"""An API key for authenticating programmatic access to the Codecademy partner API."""
+type APIKey {
+  id: ID!
+  teamId: ID!
+  label: String!
+  keyPrefix: String!
+  createdAt: DateTime!
+  expiresAt: DateTime
+  lastUsedAt: DateTime
+  isActive: Boolean!
+  scopes: [String!]!
+  createdBy: ID!
+}
+
+"""An authentication token issued for a user or service session."""
+type Token {
+  id: ID!
+  userId: ID
+  teamId: ID
+  tokenType: String!
+  issuedAt: DateTime!
+  expiresAt: DateTime!
+  scopes: [String!]!
+  revoked: Boolean!
+}
+
+"""A webhook configuration for receiving event notifications from Codecademy."""
+type Webhook {
+  id: ID!
+  teamId: ID!
+  url: URL!
+  events: [WebhookEvent!]!
+  isActive: Boolean!
+  secret: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  lastTriggeredAt: DateTime
+  failureCount: Int!
+}
+
+# ─────────────────────────────────────────────
+# Root Types
+# ─────────────────────────────────────────────
+
+type Query {
+  user(id: ID!): User
+  users(teamId: ID, limit: Int, offset: Int): [User!]!
+
+  learner(id: ID!): Learner
+  learners(teamId: ID, cohortId: ID, limit: Int, offset: Int): [Learner!]!
+
+  course(id: ID, slug: String): Course
+  courses(difficulty: DifficultyLevel, language: String, limit: Int, offset: Int): [Course!]!
+
+  track(id: ID, slug: String): Track
+  tracks(limit: Int, offset: Int): [Track!]!
+
+  path(id: ID, slug: String): Path
+  paths(pathType: String, limit: Int, offset: Int): [Path!]!
+
+  lesson(id: ID!): Lesson
+  lessons(courseId: ID!, moduleId: ID): [Lesson!]!
+
+  exercise(id: ID!): Exercise
+  exercises(lessonId: ID!): [Exercise!]!
+
+  quiz(id: ID!): Quiz
+  quizzes(courseId: ID, lessonId: ID): [Quiz!]!
+
+  project(id: ID!): Project
+  projects(courseId: ID, pathId: ID, difficulty: DifficultyLevel): [Project!]!
+
+  skill(id: ID, slug: String): Skill
+  skills(category: String, limit: Int, offset: Int): [Skill!]!
+
+  skillSet(id: ID!): SkillSet
+  skillSets(teamId: ID): [SkillSet!]!
+
+  progress(userId: ID!, contentId: ID!, contentType: String!): Progress
+  userProgress(userId: ID!, contentType: String, status: ProgressStatus): [Progress!]!
+
+  completion(id: ID!): Completion
+  completions(userId: ID!, contentType: String): [Completion!]!
+
+  certificate(id: ID!): Certificate
+  certificates(userId: ID!): [Certificate!]!
+
+  certificationPath(id: ID, slug: String): CertificationPath
+  certificationPaths(limit: Int, offset: Int): [CertificationPath!]!
+
+  team(id: ID!): Team
+  teams(limit: Int, offset: Int): [Team!]!
+
+  teamMember(id: ID!): TeamMember
+  teamMembers(teamId: ID!, role: UserRole): [TeamMember!]!
+
+  plan(id: ID!): Plan
+  plans: [Plan!]!
+
+  subscription(id: ID!): Subscription
+
+  enrollment(id: ID!): Enrollment
+  enrollments(userId: ID, teamId: ID, contentType: String): [Enrollment!]!
+
+  assignment(id: ID!): Assignment
+  assignments(teamId: ID!, cohortId: ID): [Assignment!]!
+
+  cohort(id: ID!): Cohort
+  cohorts(teamId: ID!): [Cohort!]!
+
+  workspace(id: ID!): Workspace
+  workspaces(userId: ID!, isPublic: Boolean): [Workspace!]!
+
+  apiKey(id: ID!): APIKey
+  apiKeys(teamId: ID!): [APIKey!]!
+
+  webhook(id: ID!): Webhook
+  webhooks(teamId: ID!): [Webhook!]!
+}
+
+type Mutation {
+  createEnrollment(userId: ID!, contentId: ID!, contentType: String!): Enrollment!
+  deleteEnrollment(id: ID!): Boolean!
+
+  createAssignment(teamId: ID!, contentId: ID!, contentType: String!, dueDate: DateTime, cohortId: ID): Assignment!
+  updateAssignment(id: ID!, dueDate: DateTime, status: String): Assignment!
+  deleteAssignment(id: ID!): Boolean!
+
+  createCohort(teamId: ID!, name: String!, description: String, startDate: DateTime, endDate: DateTime): Cohort!
+  updateCohort(id: ID!, name: String, description: String, startDate: DateTime, endDate: DateTime): Cohort!
+  deleteCohort(id: ID!): Boolean!
+
+  addTeamMember(teamId: ID!, userId: ID!, role: UserRole!): TeamMember!
+  removeTeamMember(teamId: ID!, userId: ID!): Boolean!
+  updateTeamMemberRole(teamId: ID!, userId: ID!, role: UserRole!): TeamMember!
+
+  createAPIKey(teamId: ID!, label: String!, scopes: [String!]!, expiresAt: DateTime): APIKey!
+  revokeAPIKey(id: ID!): Boolean!
+
+  createWebhook(teamId: ID!, url: URL!, events: [WebhookEvent!]!): Webhook!
+  updateWebhook(id: ID!, url: URL, events: [WebhookEvent!], isActive: Boolean): Webhook!
+  deleteWebhook(id: ID!): Boolean!
+
+  createWorkspace(userId: ID!, title: String!, language: String!, isPublic: Boolean): Workspace!
+  updateWorkspace(id: ID!, title: String, isPublic: Boolean): Workspace!
+  deleteWorkspace(id: ID!): Boolean!
+}
