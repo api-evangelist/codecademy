@@ -51,13 +51,13 @@ common:
   url: https://www.codecademy.com/pro
 - type: Bootcamps
   url: https://www.codecademy.com/bootcamps
-- type: Career
+- type: Careers
   url: https://www.codecademy.com/career-paths
 - type: Certifications
   url: https://www.codecademy.com/certifications
 - type: Workspaces
   url: https://www.codecademy.com/workspaces
-- type: Docs
+- type: Documentation
   url: https://www.codecademy.com/resources/docs
 - type: Blog
   url: https://www.codecademy.com/resources/blog
