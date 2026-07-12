@@ -37,6 +37,10 @@ modified: '2026-05-25'
 specificationVersion: '0.20'
 apis: []
 common:
+- type: VulnerabilityDisclosure
+  url: security/codecademy-vulnerability-disclosure.yml
+- type: DomainSecurity
+  url: security/codecademy-domain-security.yml
 - type: Website
   url: https://www.codecademy.com
 - type: About
