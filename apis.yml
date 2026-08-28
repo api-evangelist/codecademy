@@ -17,6 +17,17 @@ description: Codecademy is a New York City–based online learning platform offe
   progress, or learner data; its primary surface is the codecademy.com web application
   and mobile apps, with enterprise content delivery handled through Skillsoft channels.
 type: Index
+deliveryModel:
+  model: saas
+  open_source: false
+  commercial: true
+  callable_host: false
+  label: Hosted service · you call their endpoint
+  confidence: medium
+  source:
+  - pricing
+  generated: '2026-08-28'
+  method: derived
 accessModel:
   pricing: unknown
   onboarding: unknown
