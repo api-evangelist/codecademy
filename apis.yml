@@ -128,8 +128,6 @@ common:
   url: https://www.facebook.com/Codecademy
 - type: Instagram
   url: https://www.instagram.com/codecademy
-- url: graphql/codecademy-graphql.md
-  type: GraphQL
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
