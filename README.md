@@ -1,4 +1,4 @@
-# codecademy
+# Codecademy
 
 <!-- API-EVANGELIST-PROVENANCE:BEGIN -->
 > ### About this repository
@@ -64,4 +64,89 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-Codecademy — interactive coding tutorials, career paths, and bootcamps (Skillsoft-owned).
+Codecademy is a New York City–based online learning platform offering interactive coding tutorials, career paths, certifications, and bootcamps across programming languages, data science, AI, cloud computing, cybersecurity, and web development. Founded in 2011 by Zach Sims and Ryan Bubinski, the company built its reputation on browser-based interactive exercises that let learners write and execute code without local setup, and grew to serve millions of registered learners. Codecademy was acquired by Skillsoft in April 2022 for approximately 525 million dollars in a cash-and-stock deal, and now operates as the consumer- and individual- developer-facing brand within Skillsoft's broader corporate learning portfolio, complementing Skillsoft Percipio for enterprise customers. Codecademy's products include the free tier, Codecademy Plus, Codecademy Pro, career paths, skill paths, professional certifications, full cohort-based bootcamps (via Codecademy and Skillsoft's Global Knowledge arm), and a workspaces feature for project work. The company does not expose a public developer REST API, SDK, or partner API program for programmatic access to courses, progress, or learner data; its primary surface is the codecademy.com web application and mobile apps, with enterprise content delivery handled through Skillsoft channels.
+
+**Areas:** Education · E-Learning · Coding Tutorials · Bootcamps · Developer Education · Career Paths · Certification · Skillsoft · EdTech · Workforce Development
+
+## Codecademy on APIs.io
+
+Everything profiled for Codecademy is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/codecademy/](https://apis.io/providers/codecademy/)** — or go straight to one of the APIs or properties below.
+
+### Published properties
+
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
+
+#### GraphQL (1)
+
+GraphQL schemas.
+
+- [Moved to /providers/codecademy/](https://apis.io/graphqls/codecademy/codecademy-graphql/)
+
+#### Security (2)
+
+Authentication, trust centre, and vulnerability disclosure.
+
+- [Codecademy Domain Security](https://apis.io/security/codecademy/codecademy-domain-security/)
+- [Codecademy Vulnerability Disclosure](https://apis.io/security/codecademy/codecademy-vulnerability-disclosure/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
+
+- [Website](https://www.codecademy.com)
+- [Documentation](https://www.codecademy.com/resources/docs)
+- [Pricing](https://www.codecademy.com/pricing)
+- [Blog](https://www.codecademy.com/resources/blog)
+
+## API Evangelist rating
+
+**Kin Score 11.8** — emerging · rubric 0.24.0 · scored 2026-10-17
+
+| Facet | Score |
+|---|---|
+| Discoverability | 49.1 |
+| Contract quality | 0.0 |
+| Contract governance | 0.0 |
+| Operational transparency | 5.3 |
+| Developer ergonomics | 11.9 |
+| Access clarity | 21.1 |
+
+**Agent readiness 0.0** — human-only
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | — |
+| Agentic Access | — |
+| Reversibility Documented | — |
+| MCP Server | — |
+| Auth Clarity | — |
+| Idempotency | — |
+| Error Semantics | — |
+| OpenAPI Examples | — |
+| Rate Limit Signal | — |
+| Event Surface Described | — |
+| Agent Skills | — |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | — |
+| Delegated Identity | — |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | — |
+| Agentic Commerce | — |
+
+**Regulatory alignment 15.7** — Education & Research
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/codecademy/](https://apis.io/providers/codecademy/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for Codecademy: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/codecademy/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
